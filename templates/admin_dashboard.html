@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Fire Department{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard</h2>
+<p class="text-muted mb-4">Manage all applications and their processing status</p>
+
+{% if applications %}
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Applicant</th>
+                <th>Type</th>
+                <th>Business</th>
+                <th>Status</th>
+                <th>Submitted</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in applications %}
+            <tr>
+                <td><strong>#{{ app.id }}</strong></td>
+                <td>{{ app.applicant.username }}</td>
+                <td>
+                    <span class="badge bg-secondary">{{ app.type|title }}</span>
+                </td>
+                <td>{{ app.business_name }}</td>
+                <td>
+                    <span class="badge 
+                        {% if app.status == 'pending' %}bg-warning text-dark
+                        {% elif app.status == 'inspection_scheduled' %}bg-info
+                        {% elif app.status == 'approved' %}bg-success
+                        {% elif app.status == 'rejected' %}bg-danger
+                        {% else %}bg-secondary{% endif %}">
+                        {{ app.status|replace('_', ' ')|title }}
+                    </span>
+                </td>
+                <td>{{ app.created_at.strftime('%Y-%m-%d') }}</td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        <a href="{{ url_for('view_application', app_id=app.id) }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
+                            <span class="visually-hidden">Toggle Dropdown</span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><h6 class="dropdown-header">Update Status</h6></li>
+                            <li>
+                                <form method="POST" action="{{ url_for('update_application_status', app_id=app.id) }}" class="d-inline">
+                                    <input type="hidden" name="status" value="pending">
+                                    <button type="submit" class="dropdown-item">Pending</button>
+                                </form>
+                            </li>
+                            <li>
+                                <form method="POST" action="{{ url_for('update_application_status', app_id=app.id) }}" class="d-inline">
+                                    <input type="hidden" name="status" value="inspection_scheduled">
+                                    <button type="submit" class="dropdown-item">Inspection Scheduled</button>
+                                </form>
+                            </li>
+                            <li>
+                                <form method="POST" action="{{ url_for('update_application_status', app_id=app.id) }}" class="d-inline">
+                                    <input type="hidden" name="status" value="approved">
+                                    <button type="submit" class="dropdown-item">Approved</button>
+                                </form>
+                            </li>
+                            <li>
+                                <form method="POST" action="{{ url_for('update_application_status', app_id=app.id) }}" class="d-inline">
+                                    <input type="hidden" name="status" value="rejected">
+                                    <button type="submit" class="dropdown-item">Rejected</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="text-center py-5">
+    <i class="fas fa-clipboard-list text-muted" style="font-size: 4rem;"></i>
+    <h4 class="mt-3 text-muted">No Applications</h4>
+    <p class="text-muted">No applications have been submitted yet.</p>
+</div>
+{% endif %}
+{% endblock %}

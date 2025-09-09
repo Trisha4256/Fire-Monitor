@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Application - Fire Department{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-plus me-2"></i>Submit New Application</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="type" class="form-label">Application Type</label>
+                            <select class="form-select" id="type" name="type" required>
+                                <option value="">Select Type</option>
+                                <option value="inspection">Fire Safety Inspection</option>
+                                <option value="noc">No Objection Certificate</option>
+                                <option value="license_renewal">License Renewal</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="business_name" class="form-label">Business/Premises Name</label>
+                            <input type="text" class="form-control" id="business_name" name="business_name" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="business_address" class="form-label">Business Address</label>
+                        <textarea class="form-control" id="business_address" name="business_address" rows="3" required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="contact_phone" class="form-label">Contact Phone</label>
+                        <input type="tel" class="form-control" id="contact_phone" name="contact_phone" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="4" 
+                                  placeholder="Please describe your request in detail..." required></textarea>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('user_dashboard') }}" class="btn btn-outline-secondary me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-paper-plane me-2"></i>Submit Application
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

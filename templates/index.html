@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto text-center">
+        <div class="mb-5">
+            <i class="fas fa-fire-flame-curved text-danger" style="font-size: 4rem;"></i>
+            <h1 class="display-4 fw-bold mt-3">Fire Department</h1>
+            <h2 class="display-6">Monitoring & Evaluation System</h2>
+            <p class="lead text-muted mt-3">
+                Streamlined application processing for fire safety inspections, 
+                NOC certificates, and license renewals.
+            </p>
+        </div>
+
+        {% if not current_user.is_authenticated %}
+        <div class="row g-3 justify-content-center">
+            <div class="col-md-4">
+                <a href="{{ url_for('login') }}" class="btn btn-lg w-100">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{{ url_for('register') }}" class="btn btn-outline-secondary btn-lg w-100">
+                    <i class="fas fa-user-plus me-2"></i>Register
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div class="row g-3 justify-content-center">
+            <div class="col-md-4">
+                {% if current_user.role == 'admin' %}
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-lg w-100">
+                    <i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard
+                </a>
+                {% else %}
+                <a href="{{ url_for('user_dashboard') }}" class="btn btn-lg w-100">
+                    <i class="fas fa-tachometer-alt me-2"></i>My Dashboard
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-search text-info mb-3" style="font-size: 2rem;"></i>
+                <h5 class="card-title">Fire Safety Inspections</h5>
+                <p class="card-text">Request comprehensive fire safety inspections for your premises to ensure compliance with safety regulations.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-certificate text-success mb-3" style="font-size: 2rem;"></i>
+                <h5 class="card-title">NOC Certificates</h5>
+                <p class="card-text">Apply for No Objection Certificates required for construction, events, and business operations.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-sync-alt text-warning mb-3" style="font-size: 2rem;"></i>
+                <h5 class="card-title">License Renewals</h5>
+                <p class="card-text">Renew your fire safety licenses and certifications with our streamlined process.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
