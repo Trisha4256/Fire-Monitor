@@ -45,5 +45,9 @@ args = "uv add flask-login && python main.py"
 localPort = 5000
 externalPort = 80
 
+[[ports]]
+localPort = 39221
+externalPort = 3000
+
 [agent]
 integrations = ["styling_replit==1.0.0"]
