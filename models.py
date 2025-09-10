@@ -32,6 +32,7 @@ class Application(db.Model):
     business_name = db.Column(db.String(200))
     business_address = db.Column(db.Text)
     contact_phone = db.Column(db.String(20))
+    image_filename = db.Column(db.String(255))  # Store uploaded image filename
     status = db.Column(db.String(50), nullable=False, default='pending')  # 'pending', 'inspection_scheduled', 'approved', 'rejected'
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
