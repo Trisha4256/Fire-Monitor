@@ -1,12 +1,14 @@
 import os
 import logging
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.middleware.proxy_fix import ProxyFix
+from werkzeug.utils import secure_filename
 from datetime import datetime, date
 from sqlalchemy.orm import DeclarativeBase
+import uuid
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -29,6 +31,11 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
 }
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Configure file uploads
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10MB max file size
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf', 'doc', 'docx'}
+
 # Initialize extensions
 db.init_app(app)
 login_manager = LoginManager()
@@ -43,6 +50,25 @@ with app.app_context():
 @login_manager.user_loader
 def load_user(user_id):
     return models.User.query.get(int(user_id))
+
+# Helper functions for file upload
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def save_uploaded_file(file):
+    if file and allowed_file(file.filename):
+        # Generate unique filename
+        filename = secure_filename(file.filename)
+        unique_filename = f"{uuid.uuid4().hex}_{filename}"
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+        
+        # Ensure upload directory exists
+        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+        
+        file.save(file_path)
+        return unique_filename
+    return None
 
 # ===== ROUTES =====
 
@@ -137,6 +163,16 @@ def submit_application():
         business_address = request.form['business_address']
         contact_phone = request.form['contact_phone']
         
+        # Handle file upload
+        image_filename = None
+        if 'image' in request.files:
+            file = request.files['image']
+            if file.filename != '':
+                image_filename = save_uploaded_file(file)
+                if image_filename is None:
+                    flash('Invalid file type. Please upload images, PDF, or Word documents only.', 'danger')
+                    return render_template('submit_application.html')
+        
         # Create new application
         application = models.Application(
             applicant_id=current_user.id,
@@ -144,7 +180,8 @@ def submit_application():
             description=description,
             business_name=business_name,
             business_address=business_address,
-            contact_phone=contact_phone
+            contact_phone=contact_phone,
+            image_filename=image_filename
         )
         
         db.session.add(application)
@@ -299,3 +336,9 @@ def issue_noc():
     
     flash(f'NOC {noc_number} issued successfully!', 'success')
     return redirect(url_for('manage_nocs'))
+
+@app.route('/uploads/<filename>')
+@login_required
+def uploaded_file(filename):
+    """Serve uploaded files securely"""
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
